@@ -3,6 +3,7 @@ package com.raymond.beccasinventory.ui.screens
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -404,19 +405,19 @@ fun ItemStaticContent(
 
         // Name + Tags
         Column(modifier = Modifier.weight(1f)) {
-//            Text(text = name, style = MaterialTheme.typography.titleMedium)
-//            if (tags.isNotEmpty()) {
-//                Spacer(modifier = Modifier.height(4.dp))
-//                @OptIn(ExperimentalLayoutApi::class)
-//                FlowRow(
-//                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-//                    verticalArrangement = Arrangement.spacedBy(6.dp)
-//                ) {
-//                tags.forEach { tag: Tag ->
-//                    ReadOnlyTag(tag.name)
-//                }
-//                }
-//            }
+            Text(text = name, style = MaterialTheme.typography.titleMedium)
+            if (tags.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                @OptIn(ExperimentalLayoutApi::class)
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    tags.forEach { tag: Tag ->
+                        ReadOnlyTag(tag.name)
+                    }
+                }
+            }
         }
     }
 }
@@ -487,6 +488,7 @@ fun QuantityRow(
 fun ReadOnlyTag(name: String) {
     Box(
         modifier = Modifier
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
