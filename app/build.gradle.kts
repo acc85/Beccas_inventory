@@ -52,11 +52,9 @@ android {
     }
     lint {
         disable += setOf(
-            "IconLauncherShape",
-            "MonochromeLauncherIcon",
-            "IconDuplicates",
-            "GradleDependency",
-            "ObsoleteLintCustomCheck"
+            "IconLauncherShape", // Requires resizing raw image pixels
+            "GradleDependency",  // AGP update breaks local gradle wrapper
+            "ObsoleteLintCustomCheck" // Bug in compose BOM's lint module
         )
     }
 }
