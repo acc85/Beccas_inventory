@@ -2,12 +2,14 @@ package com.raymond.beccasinventory.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.raymond.beccasinventory.contracts.repository.PreferencesRepository
 import com.raymond.beccasinventory.contracts.usecase.InventoryItemUseCase
 import com.raymond.beccasinventory.models.InventoryItem
 import com.raymond.beccasinventory.models.Tag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.collections.immutable.toImmutableList
@@ -15,8 +17,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InventoryItemsViewModel @Inject constructor(
-    private val inventoryItemUseCase: InventoryItemUseCase
+    private val inventoryItemUseCase: InventoryItemUseCase,
+    private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
+
+    val isLocked: StateFlow<Boolean> = preferencesRepository.isLocked
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
 
     val inventoryItems: StateFlow<List<InventoryItem>> = inventoryItemUseCase.observeInventoryItems()
         .stateIn(
@@ -81,6 +91,12 @@ class InventoryItemsViewModel @Inject constructor(
     fun updateQuantity(item: InventoryItem, newQuantity: Int) {
         viewModelScope.launch {
             inventoryItemUseCase.updateInventoryItemQuantity(item.copy(quantity = newQuantity))
+        }
+    }
+
+    fun toggleLocked() {
+        viewModelScope.launch {
+            preferencesRepository.setLocked(!isLocked.value)
         }
     }
 }

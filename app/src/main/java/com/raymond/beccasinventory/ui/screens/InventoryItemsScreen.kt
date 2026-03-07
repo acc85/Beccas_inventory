@@ -142,6 +142,7 @@ fun InventoryItemsScreen(
                             inventoryItem = inventoryItem,
                             isSelected = isSelected,
                             inSelectionMode = inSelectionMode,
+                            isUnlocked = isUnlocked,
                             onToggleSelect = stableOnToggleSelect,
                             onTap = stableOnTap,
                             onDelete = stableOnDelete,
@@ -214,6 +215,7 @@ fun SwipeableInventoryItemItem(
     inventoryItem: InventoryItem,
     isSelected: Boolean = false,
     inSelectionMode: Boolean = false,
+    isUnlocked: Boolean = false,
     onToggleSelect: (Long) -> Unit = {},
     onTap: (InventoryItem) -> Unit,
     onDelete: (InventoryItem) -> Unit,
@@ -359,6 +361,7 @@ fun SwipeableInventoryItemItem(
                 QuantityRow(
                     id = inventoryItem.id,
                     initialQuantity = inventoryItem.quantity,
+                    isUnlocked = isUnlocked,
                     onQuantityChange = { newQty -> onQuantityChange(inventoryItem, newQty) }
                 )
 
@@ -401,19 +404,19 @@ fun ItemStaticContent(
 
         // Name + Tags
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = name, style = MaterialTheme.typography.titleMedium)
-            if (tags.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(4.dp))
-                @OptIn(ExperimentalLayoutApi::class)
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                tags.forEach { tag: Tag ->
-                    ReadOnlyTag(tag.name)
-                }
-                }
-            }
+//            Text(text = name, style = MaterialTheme.typography.titleMedium)
+//            if (tags.isNotEmpty()) {
+//                Spacer(modifier = Modifier.height(4.dp))
+//                @OptIn(ExperimentalLayoutApi::class)
+//                FlowRow(
+//                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+//                    verticalArrangement = Arrangement.spacedBy(6.dp)
+//                ) {
+//                tags.forEach { tag: Tag ->
+//                    ReadOnlyTag(tag.name)
+//                }
+//                }
+//            }
         }
     }
 }
@@ -422,6 +425,7 @@ fun ItemStaticContent(
 fun QuantityRow(
     id: Long,
     initialQuantity: Int,
+    isUnlocked: Boolean,
     onQuantityChange: (Int) -> Unit
 ) {
     var localQuantity by remember(id) { mutableStateOf(initialQuantity) }
@@ -439,16 +443,20 @@ fun QuantityRow(
                     onQuantityChange(localQuantity)
                 }
             },
+            enabled = isUnlocked,
             modifier = Modifier
                 .size(32.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+                .background(
+                    if (isUnlocked) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    RoundedCornerShape(8.dp)
+                )
         ) {
-            Text("-", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("-", style = MaterialTheme.typography.titleMedium, color = if (isUnlocked) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
         }
         Text(
             text = "$localQuantity",
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = if (isUnlocked) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             modifier = Modifier.width(40.dp)
         )
@@ -457,11 +465,20 @@ fun QuantityRow(
                 localQuantity++
                 onQuantityChange(localQuantity)
             },
+            enabled = isUnlocked,
             modifier = Modifier
                 .size(32.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+                .background(
+                    if (isUnlocked) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    RoundedCornerShape(8.dp)
+                )
         ) {
-            Icon(Icons.Filled.Add, contentDescription = "Increase", modifier = Modifier.size(16.dp))
+            Icon(
+                Icons.Filled.Add, 
+                contentDescription = "Increase", 
+                modifier = Modifier.size(16.dp),
+                tint = if (isUnlocked) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+            )
         }
     }
 }

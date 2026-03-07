@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,7 @@ import com.raymond.beccasinventory.ui.navigation.MainBottomNavigation
 import com.raymond.beccasinventory.ui.screens.InventoryItemsScreen
 import androidx.activity.compose.BackHandler
 import kotlinx.coroutines.launch
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +54,7 @@ fun MainApp(
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
+    val inventoryViewModel: com.raymond.beccasinventory.ui.screens.InventoryItemsViewModel = hiltViewModel()
 
     val currentRoute = when (pagerState.currentPage) {
         0 -> BottomRoute.InventoryItems
@@ -70,8 +73,9 @@ fun MainApp(
     // Show confirmation dialog state
     var showDeleteConfirm by remember { mutableStateOf(false) }
 
-    // Lock/Unlock state for quantity editing
-    var isUnlocked by remember { mutableStateOf(false) }
+    // Lock/Unlock state observed from DataStore
+    val isLocked by inventoryViewModel.isLocked.collectAsState()
+    val isUnlocked = !isLocked
 
     val inMultiSelectMode = selectedInventoryItemIds.isNotEmpty()
     BackHandler(enabled = inMultiSelectMode) {
@@ -118,7 +122,7 @@ fun MainApp(
                         } else {
                             if (currentRoute == BottomRoute.InventoryItems) {
                                 androidx.compose.foundation.layout.Row {
-                                    IconButton(onClick = { isUnlocked = !isUnlocked }) {
+                                    IconButton(onClick = { inventoryViewModel.toggleLocked() }) {
                                         Icon(
                                             imageVector = if (isUnlocked) Icons.Filled.LockOpen else Icons.Filled.Lock,
                                             contentDescription = if (isUnlocked) "Lock Quantities" else "Unlock Quantities",
@@ -201,7 +205,8 @@ fun MainApp(
                             selectedInventoryItemIds = emptySet()
                             showDeleteConfirm = false
                         },
-                        isUnlocked = isUnlocked
+                        isUnlocked = isUnlocked,
+                        viewModel = inventoryViewModel
                     )
                     1 -> com.raymond.beccasinventory.ui.screens.SettingsScreen()
                 }

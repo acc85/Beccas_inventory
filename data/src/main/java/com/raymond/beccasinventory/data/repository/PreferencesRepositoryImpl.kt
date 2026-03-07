@@ -2,6 +2,7 @@ package com.raymond.beccasinventory.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.raymond.beccasinventory.contracts.repository.PreferencesRepository
@@ -16,6 +17,7 @@ class PreferencesRepositoryImpl @Inject constructor(
 
     private object PreferencesKeys {
         val APP_THEME = stringPreferencesKey("app_theme")
+        val IS_LOCKED = booleanPreferencesKey("is_locked")
     }
 
     override val appTheme: Flow<AppTheme> = dataStore.data.map { preferences ->
@@ -27,9 +29,19 @@ class PreferencesRepositoryImpl @Inject constructor(
         }
     }
 
+    override val isLocked: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[PreferencesKeys.IS_LOCKED] ?: false
+    }
+
     override suspend fun setAppTheme(theme: AppTheme) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.APP_THEME] = theme.name
+        }
+    }
+
+    override suspend fun setLocked(locked: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.IS_LOCKED] = locked
         }
     }
 }
