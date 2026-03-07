@@ -1,9 +1,9 @@
 package com.raymond.beccasinventory.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 enum class BottomRoute(
     val title: String
 ) {
-    InventoryItems("InventoryItems"),
+    InventoryItems("Inventory"),
     Settings("Settings")
 }
 
@@ -33,7 +33,7 @@ fun MainBottomNavigation(
             onClick = { onNavigate(BottomRoute.InventoryItems) },
             icon = {
                 Icon(
-                    imageVector = if (currentRoute == BottomRoute.InventoryItems) Icons.Filled.List else Icons.Outlined.List,
+                    imageVector = if (currentRoute == BottomRoute.InventoryItems) Icons.AutoMirrored.Filled.List else Icons.AutoMirrored.Outlined.List,
                     contentDescription = "InventoryItems"
                 )
             },
