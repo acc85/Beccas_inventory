@@ -40,12 +40,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.clip
 import com.raymond.beccasinventory.ui.navigation.BottomRoute
 import com.raymond.beccasinventory.ui.navigation.MainBottomNavigation
 import com.raymond.beccasinventory.ui.screens.InventoryItemsScreen
 import androidx.activity.compose.BackHandler
 import kotlinx.coroutines.launch
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.raymond.beccasinventory.models.InventorySortType
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.automirrored.filled.List
+import com.raymond.beccasinventory.models.SortDirection
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.HorizontalDivider
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -66,6 +85,8 @@ fun MainApp(
     var showAddInventoryItem by remember { mutableStateOf(false) }
 
     var searchQuery by remember { mutableStateOf("") }
+    var sortType by remember { mutableStateOf(InventorySortType.NAME) }
+    var sortDirection by remember { mutableStateOf(SortDirection.ASCENDING) }
     
     // Multi-Select States hoisted to parent
     var selectedInventoryItemIds by remember { mutableStateOf(setOf<Long>()) }
@@ -179,6 +200,80 @@ fun MainApp(
                         .fillMaxWidth()
                         .padding(top = 12.dp, start = 16.dp, end = 16.dp, bottom = 4.dp)
                 )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Sort by:",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    
+                    var showSortMenu by remember { mutableStateOf(false) }
+                    Box {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { showSortMenu = true }
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = if (sortType == InventorySortType.NAME) "Name" else "Qty",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Icon(Icons.Filled.ArrowDropDown, contentDescription = null, modifier = Modifier.size(20.dp))
+                        }
+                        DropdownMenu(
+                            expanded = showSortMenu,
+                            onDismissRequest = { showSortMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Name") },
+                                onClick = {
+                                    sortType = InventorySortType.NAME
+                                    showSortMenu = false
+                                },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = null) }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Quantity") },
+                                onClick = {
+                                    sortType = InventorySortType.QUANTITY
+                                    showSortMenu = false
+                                },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    IconButton(
+                        onClick = {
+                            sortDirection = if (sortDirection == SortDirection.ASCENDING) {
+                                SortDirection.DESCENDING
+                            } else {
+                                SortDirection.ASCENDING
+                            }
+                        },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (sortDirection == SortDirection.ASCENDING) Icons.Filled.ArrowUpward else Icons.Filled.ArrowDownward,
+                            contentDescription = "Toggle Sort Direction",
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
 
             HorizontalPager(
@@ -206,6 +301,8 @@ fun MainApp(
                             showDeleteConfirm = false
                         },
                         isUnlocked = isUnlocked,
+                        sortType = sortType,
+                        sortDirection = sortDirection,
                         viewModel = inventoryViewModel
                     )
                     1 -> com.raymond.beccasinventory.ui.screens.SettingsScreen()

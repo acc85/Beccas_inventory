@@ -61,6 +61,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.raymond.beccasinventory.models.InventoryItem
 import com.raymond.beccasinventory.models.Tag
+import com.raymond.beccasinventory.models.InventorySortType
+import com.raymond.beccasinventory.models.SortDirection
 import kotlinx.collections.immutable.ImmutableList
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -82,6 +84,8 @@ fun InventoryItemsScreen(
     onDeleteConfirmDismiss: () -> Unit = {},
     onDeleteConfirmComplete: () -> Unit = {},
     isUnlocked: Boolean = false,
+    sortType: InventorySortType = InventorySortType.NAME,
+    sortDirection: SortDirection = SortDirection.ASCENDING,
     modifier: Modifier = Modifier,
     viewModel: InventoryItemsViewModel = hiltViewModel()
 ) {
@@ -107,14 +111,26 @@ fun InventoryItemsScreen(
         }
     }
     
-    // Filter by name OR any matching tag
-    val filteredInventoryItems = remember(inventoryItems, searchQuery) {
-        if (searchQuery.isBlank()) inventoryItems
-        else {
+    // Filter and sort items
+    val filteredInventoryItems = remember(inventoryItems, searchQuery, sortType, sortDirection) {
+        val filtered = if (searchQuery.isBlank()) {
+            inventoryItems
+        } else {
             val query = searchQuery.lowercase()
             inventoryItems.filter { item ->
                 item.name.lowercase().contains(query) || 
                 item.tags.any { it.name.lowercase().contains(query) }
+            }
+        }
+        
+        when (sortType) {
+            InventorySortType.NAME -> {
+                if (sortDirection == SortDirection.ASCENDING) filtered.sortedBy { it.name.lowercase() }
+                else filtered.sortedByDescending { it.name.lowercase() }
+            }
+            InventorySortType.QUANTITY -> {
+                if (sortDirection == SortDirection.ASCENDING) filtered.sortedBy { it.quantity }
+                else filtered.sortedByDescending { it.quantity }
             }
         }
     }
