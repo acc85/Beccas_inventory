@@ -69,6 +69,7 @@ private val ACTION_BUTTON_WIDTH = 140.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InventoryItemsScreen(
+    modifier: Modifier = Modifier,
     searchQuery: String = "",
     selectedIds: Set<Long> = emptySet(),
     onToggleSelect: (Long) -> Unit = {},
@@ -80,7 +81,6 @@ fun InventoryItemsScreen(
     isUnlocked: Boolean = false,
     sortType: InventorySortType = InventorySortType.NAME,
     sortDirection: SortDirection = SortDirection.ASCENDING,
-    modifier: Modifier = Modifier,
     viewModel: InventoryItemsViewModel = hiltViewModel()
 ) {
     val inventoryItems by viewModel.inventoryItems.collectAsState()
@@ -224,6 +224,7 @@ fun InventoryItemsScreen(
 @Composable
 fun SwipeableInventoryItemItem(
     inventoryItem: InventoryItem,
+    modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     inSelectionMode: Boolean = false,
     isUnlocked: Boolean = false,
@@ -231,8 +232,7 @@ fun SwipeableInventoryItemItem(
     onTap: (InventoryItem) -> Unit,
     onDelete: (InventoryItem) -> Unit,
     onEdit: (InventoryItem) -> Unit,
-    onQuantityChange: (InventoryItem, Int) -> Unit = { _, _ -> },
-    modifier: Modifier = Modifier
+    onQuantityChange: (InventoryItem, Int) -> Unit = { _, _ -> }
 ) {
     val scope = rememberCoroutineScope()
     // Positive offset = card moves RIGHT = buttons revealed on LEFT

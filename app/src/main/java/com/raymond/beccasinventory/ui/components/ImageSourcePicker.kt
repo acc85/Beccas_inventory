@@ -73,7 +73,7 @@ fun rememberImagePickerLauncher(onImageSelected: (Uri) -> Unit): () -> Unit {
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
+    ) { _ ->
         // We launch the picker even if some are denied, because the system gallery selector 
         // on newer Android versions doesn't actually need READ_MEDIA_IMAGES. 
         // But doing this suppresses the dreaded "Can't load some photos" bug from Google Photos.

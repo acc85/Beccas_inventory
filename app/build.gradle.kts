@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.raymond.beccasinventory"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.raymond.beccasinventory"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -49,6 +49,15 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    lint {
+        disable += setOf(
+            "IconLauncherShape",
+            "MonochromeLauncherIcon",
+            "IconDuplicates",
+            "GradleDependency",
+            "ObsoleteLintCustomCheck"
+        )
     }
 }
 
