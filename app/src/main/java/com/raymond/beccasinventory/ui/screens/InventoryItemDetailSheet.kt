@@ -83,7 +83,9 @@ fun InventoryItemDetailSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,
             dragHandle = null,
-            windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 0.dp,
+            windowInsets = WindowInsets.statusBars
         ) {
             // Connection that consumes vertical scroll to prevent sheet dragging down
             val nestedScrollConnection = remember {
@@ -113,7 +115,7 @@ fun InventoryItemDetailSheet(
 
                 // ── Toolbar ────────────────────────────────────────
                         TopAppBar(
-                            title = { Text("Details") },
+                            title = { Text("InventoryItem Details") },
                             navigationIcon = {
                                 IconButton(onClick = {
                                     isHiding = true
@@ -126,7 +128,7 @@ fun InventoryItemDetailSheet(
                                 }
                             },
                             colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                containerColor = MaterialTheme.colorScheme.surface
                             ),
                             windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
                         )

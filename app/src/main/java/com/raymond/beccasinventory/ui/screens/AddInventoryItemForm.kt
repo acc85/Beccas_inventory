@@ -179,7 +179,9 @@ private fun AddInventoryItemContent(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = null,
-        windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp,
+        windowInsets = WindowInsets.statusBars
     ) {
         // Connection that consumes vertical scroll to prevent sheet dragging down
         val nestedScrollConnection = remember {
@@ -222,9 +224,9 @@ private fun AddInventoryItemContent(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        containerColor = MaterialTheme.colorScheme.surface
                     ),
-                    windowInsets = androidx.compose.foundation.layout.WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
+                    windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
                 )
 
                 // ── Body ─────────────────────────────────────────────────
