@@ -190,7 +190,7 @@ fun MainApp(
                     onValueChange = { searchQuery = it },
                     placeholder = { Text(searchHint) },
                     leadingIcon = {
-                        Icon(androidx.compose.material.icons.Icons.Filled.Search, contentDescription = "Search")
+                        Icon(Icons.Filled.Search, contentDescription = "Search")
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),

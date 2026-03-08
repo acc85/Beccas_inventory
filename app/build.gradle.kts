@@ -52,9 +52,10 @@ android {
     }
     lint {
         disable += setOf(
-            "IconLauncherShape", // Requires resizing raw image pixels
-            "GradleDependency",  // AGP update breaks local gradle wrapper
-            "ObsoleteLintCustomCheck" // Bug in compose BOM's lint module
+            "IconLauncherShape",       // Requires resizing raw image pixels
+            "GradleDependency",        // AGP update breaks local gradle wrapper
+            "ObsoleteLintCustomCheck", // Bug in compose BOM's lint module
+            "OldTargetApi"             // AGP 8.2.2 cannot compile against API 36+
         )
     }
 }
