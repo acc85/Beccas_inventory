@@ -141,6 +141,8 @@ private fun EditInventoryItemContent(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = null,
+        containerColor = Color.Transparent,
+        tonalElevation = 0.dp,
         windowInsets = WindowInsets.statusBars
     ) {
         // Connection that consumes vertical scroll to prevent sheet dragging down
@@ -156,18 +158,22 @@ private fun EditInventoryItemContent(
         val statusBarTopDp = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
         val maxSheetHeight = LocalConfiguration.current.screenHeightDp.dp - statusBarTopDp
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = maxSheetHeight)
-                .navigationBarsPadding()
-                .nestedScroll(nestedScrollConnection)
-                .pointerInput(Unit) {
-                    detectDragGestures { change, _ ->
-                        change.consume()
-                    }
-                }
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surface
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = maxSheetHeight)
+                    .navigationBarsPadding()
+                    .nestedScroll(nestedScrollConnection)
+                    .pointerInput(Unit) {
+                        detectDragGestures { change, _ ->
+                            change.consume()
+                        }
+                    }
+            ) {
 
             // ── Toolbar ──────────────────────────────────────────
                 TopAppBar(
@@ -380,6 +386,7 @@ private fun EditInventoryItemContent(
 
                     Spacer(modifier = Modifier.height(24.dp))
                 }
+            }
         }
     }
 }
