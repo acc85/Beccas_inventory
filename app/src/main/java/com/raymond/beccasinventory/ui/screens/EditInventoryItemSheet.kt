@@ -141,7 +141,7 @@ private fun EditInventoryItemContent(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = null,
-        scrimColor = Color.Transparent
+        windowInsets = WindowInsets.statusBars
     ) {
         // Connection that consumes vertical scroll to prevent sheet dragging down
         val nestedScrollConnection = remember {
