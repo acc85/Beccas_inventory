@@ -86,59 +86,12 @@ fun AddInventoryItemSheet(
     onSave: (String, Int, String?, List<Tag>) -> Unit,
     onDismiss: () -> Unit
 ) {
-    // Track whether we are in the "save" exit (fade) vs dismiss exit (slide)
-    var isSaving by remember { mutableStateOf(false) }
-    // Reset saving state whenever the sheet becomes invisible again
-    LaunchedEffect(visible) {
-        if (!visible) isSaving = false
-    }
 
-    // Scrim / background dimmer
-    AnimatedVisibility(
-        visible = visible,
-        enter = slideInVertically(
-            initialOffsetY = { it },
-            animationSpec = tween(400)
-        ),
-        exit = if (isSaving) {
-            fadeOut(animationSpec = tween(300))
-        } else {
-            slideOutVertically(
-                targetOffsetY = { it },
-                animationSpec = tween(350)
-            )
-        }
-    ) {
-        // Dim scrim behind the sheet content
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.45f))
-                .clickable(onClick = onDismiss)
-        )
-    }
 
-    AnimatedVisibility(
-        visible = visible,
-        enter = slideInVertically(
-            initialOffsetY = { it },
-            animationSpec = tween(400)
-        ),
-        exit = if (isSaving) {
-            fadeOut(animationSpec = tween(300))
-        } else {
-            slideOutVertically(
-                targetOffsetY = { it },
-                animationSpec = tween(350)
-            )
-        }
-    ) {
+    if (visible) {
         AddInventoryItemContent(
             allInventoryItems = allInventoryItems,
-            onSave = { name, desc, uri, tags ->
-                isSaving = true
-                onSave(name, desc, uri, tags)
-            },
+            onSave = onSave,
             onDismiss = onDismiss
         )
     }

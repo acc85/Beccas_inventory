@@ -91,42 +91,15 @@ fun EditInventoryItemSheet(
     onDismiss: () -> Unit
 ) {
     val visible = inventoryItem != null
-    var isSaving by remember { mutableStateOf(false) }
-    LaunchedEffect(visible) { if (!visible) isSaving = false }
 
-    // Scrim
-    AnimatedVisibility(
-        visible = visible,
-        enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(400)),
-        exit = if (isSaving) fadeOut(tween(300))
-               else slideOutVertically(targetOffsetY = { it }, animationSpec = tween(350))
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.45f))
-                .clickable(onClick = onDismiss)
+
+    if (visible && inventoryItem != null) {
+        EditInventoryItemContent(
+            initial = inventoryItem,
+            allInventoryItems = allInventoryItems,
+            onSave = onSave,
+            onDismiss = onDismiss
         )
-    }
-
-    // Sheet
-    AnimatedVisibility(
-        visible = visible,
-        enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(400)),
-        exit = if (isSaving) fadeOut(tween(300))
-               else slideOutVertically(targetOffsetY = { it }, animationSpec = tween(350))
-    ) {
-        if (inventoryItem != null) {
-            EditInventoryItemContent(
-                initial = inventoryItem,
-                allInventoryItems = allInventoryItems,
-                onSave = { name, desc, uri, tags ->
-                    isSaving = true
-                    onSave(name, desc, uri, tags)
-                },
-                onDismiss = onDismiss
-            )
-        }
     }
 }
 
