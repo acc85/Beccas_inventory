@@ -167,7 +167,6 @@ private fun EditInventoryItemContent(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = null,
-        sheetMaxWidth = androidx.compose.ui.unit.Dp.Unspecified,
         windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
     ) {
         // Connection that consumes vertical scroll to prevent sheet dragging down
