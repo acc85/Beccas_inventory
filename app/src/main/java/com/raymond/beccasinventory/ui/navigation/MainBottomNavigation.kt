@@ -26,7 +26,8 @@ fun MainBottomNavigation(
     modifier: Modifier = Modifier
 ) {
     NavigationBar(
-        modifier = modifier
+        modifier = modifier,
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface
     ) {
         NavigationBarItem(
             selected = currentRoute == BottomRoute.InventoryItems,
