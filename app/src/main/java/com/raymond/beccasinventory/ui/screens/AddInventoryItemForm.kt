@@ -48,6 +48,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -133,13 +135,22 @@ private fun AddInventoryItemContent(
     onSave: (String, Int, String?, List<Tag>) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var quantity by remember { mutableStateOf("") }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var currentTag by remember { mutableStateOf("") }
-    val tags = remember { mutableStateListOf<Tag>() }
+    var name by rememberSaveable { mutableStateOf("") }
+    var quantity by rememberSaveable { mutableStateOf("") }
     
-    val launchImagePicker = rememberImagePickerLauncher(onImageSelected = { uri -> imageUri = uri })
+    // Convert Uri to String for safe saving
+    var imageUriString by rememberSaveable { mutableStateOf<String?>(null) }
+    val imageUri = imageUriString?.let { Uri.parse(it) }
+    
+    var currentTag by rememberSaveable { mutableStateOf("") }
+    
+    val tagSaver = listSaver<androidx.compose.runtime.snapshots.SnapshotStateList<Tag>, String>(
+        save = { it.map { tag -> tag.name } },
+        restore = { savedList -> androidx.compose.runtime.mutableStateListOf(*savedList.map { Tag(name = it) }.toTypedArray()) }
+    )
+    val tags = rememberSaveable(saver = tagSaver) { mutableStateListOf<Tag>() }
+    
+    val launchImagePicker = rememberImagePickerLauncher(onImageSelected = { uri -> imageUriString = uri.toString() })
 
     // Sheet sits at the bottom, aligned to the bottom of the screen
     Box(
@@ -266,7 +277,7 @@ private fun AddInventoryItemContent(
                     }
                     
                     val suggestions = existingTags.filter { it.contains(currentTag, ignoreCase = true) }
-                    var expanded by remember { mutableStateOf(false) }
+                    var expanded by rememberSaveable { mutableStateOf(false) }
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

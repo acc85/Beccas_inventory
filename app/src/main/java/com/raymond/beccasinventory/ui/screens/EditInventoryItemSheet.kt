@@ -48,6 +48,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -120,13 +122,23 @@ private fun EditInventoryItemContent(
     onDismiss: () -> Unit
 ) {
     // Pre-fill fields from existing entry
-    var name by remember(initial.id) { mutableStateOf(initial.name) }
-    var quantity by remember(initial.id) { mutableStateOf(initial.quantity.toString()) }
-    var imageUri by remember { mutableStateOf(initial.imageUri?.toUri()) }
-    var currentTag by remember(initial.id) { mutableStateOf("") }
-    val tags = remember { mutableStateListOf<Tag>() }.also { it.addAll(initial.tags) }
+    var name by rememberSaveable(initial.id) { mutableStateOf(initial.name) }
+    var quantity by rememberSaveable(initial.id) { mutableStateOf(initial.quantity.toString()) }
     
-    val launchImagePicker = rememberImagePickerLauncher(onImageSelected = { uri -> imageUri = uri })
+    var imageUriString by rememberSaveable(initial.id) { mutableStateOf(initial.imageUri) }
+    val imageUri = imageUriString?.toUri()
+    
+    var currentTag by rememberSaveable(initial.id) { mutableStateOf("") }
+    
+    val tagSaver = listSaver<androidx.compose.runtime.snapshots.SnapshotStateList<Tag>, String>(
+        save = { snapshotList -> snapshotList.map { it.name } },
+        restore = { savedNames -> androidx.compose.runtime.mutableStateListOf(*savedNames.map { Tag(name = it) }.toTypedArray()) }
+    )
+    val tags = rememberSaveable(initial.id, saver = tagSaver) { 
+        androidx.compose.runtime.mutableStateListOf<Tag>().also { it.addAll(initial.tags) } 
+    }
+    
+    val launchImagePicker = rememberImagePickerLauncher(onImageSelected = { uri -> imageUriString = uri.toString() })
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         Surface(
@@ -247,7 +259,7 @@ private fun EditInventoryItemContent(
                     }
                     
                     val suggestions = existingTags.filter { it.contains(currentTag, ignoreCase = true) }
-                    var expanded by remember { mutableStateOf(false) }
+                    var expanded by rememberSaveable { mutableStateOf(false) }
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

@@ -43,6 +43,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -83,14 +84,23 @@ fun InventoryItemsScreen(
     viewModel: InventoryItemsViewModel = hiltViewModel()
 ) {
     val inventoryItems by viewModel.inventoryItems.collectAsState()
-    var detailInventoryItem by remember { mutableStateOf<InventoryItem?>(null) }
-    var editInventoryItem by remember { mutableStateOf<InventoryItem?>(null) }
-    var inventoryItemToDelete by remember { mutableStateOf<InventoryItem?>(null) }
+    var detailInventoryItemId by rememberSaveable { mutableStateOf<Long?>(null) }
+    val detailInventoryItem = remember(detailInventoryItemId, inventoryItems) {
+        detailInventoryItemId?.let { id -> inventoryItems.find { it.id == id } }
+    }
+    var editInventoryItemId by rememberSaveable { mutableStateOf<Long?>(null) }
+    val editInventoryItem = remember(editInventoryItemId, inventoryItems) {
+        editInventoryItemId?.let { id -> inventoryItems.find { it.id == id } }
+    }
+    var inventoryItemToDeleteId by rememberSaveable { mutableStateOf<Long?>(null) }
+    val inventoryItemToDelete = remember(inventoryItemToDeleteId, inventoryItems) {
+        inventoryItemToDeleteId?.let { id -> inventoryItems.find { it.id == id } }
+    }
 
     // Stable callbacks to prevent unnecessary recomposition
     val stableOnToggleSelect = remember { { id: Long -> onToggleSelect(id) } }
-    val stableOnDelete = remember { { item: InventoryItem -> inventoryItemToDelete = item } }
-    val stableOnEdit = remember { { item: InventoryItem -> editInventoryItem = item } }
+    val stableOnDelete = remember { { item: InventoryItem -> inventoryItemToDeleteId = item.id } }
+    val stableOnEdit = remember { { item: InventoryItem -> editInventoryItemId = item.id } }
     val stableOnQuantityChange = remember { { item: InventoryItem, newQty: Int -> viewModel.updateQuantity(item, newQty) } }
     
     // Tap handler depends on selection mode
@@ -99,7 +109,7 @@ fun InventoryItemsScreen(
             if (selectedIds.isNotEmpty()) {
                 onToggleSelect(item.id)
             } else {
-                detailInventoryItem = item
+                detailInventoryItemId = item.id
             }
         }
     }
@@ -178,18 +188,18 @@ fun InventoryItemsScreen(
         // Detail sheet
         InventoryItemDetailSheet(
             inventoryItem = detailInventoryItem,
-            onDismiss = { detailInventoryItem = null }
+            onDismiss = { detailInventoryItemId = null }
         )
 
         // Edit sheet
         EditInventoryItemSheet(
             inventoryItem = editInventoryItem,
             allInventoryItems = inventoryItems,
-            onSave = { name, desc, uri, tags ->
-                editInventoryItem?.let { viewModel.updateInventoryItem(it, name, desc, uri, tags) }
-                editInventoryItem = null
+            onSave = { name, quantity, imageUri, tags ->
+                editInventoryItem?.let { viewModel.updateInventoryItem(it, name, quantity, imageUri, tags) }
+                editInventoryItemId = null
             },
-            onDismiss = { editInventoryItem = null }
+            onDismiss = { editInventoryItemId = null }
         )
 
         // Delete Confirmation Dialog for batch deletions
@@ -210,10 +220,10 @@ fun InventoryItemsScreen(
             DeleteConfirmationDialog(
                 itemCount = 1,
                 onConfirm = {
-                    inventoryItemToDelete?.let { viewModel.deleteInventoryItem(it) }
-                    inventoryItemToDelete = null
+                    viewModel.deleteInventoryItem(inventoryItemToDelete)
+                    inventoryItemToDeleteId = null
                 },
-                onDismiss = { inventoryItemToDelete = null }
+                onDismiss = { inventoryItemToDeleteId = null }
             )
         }
     }
@@ -438,7 +448,7 @@ fun QuantityRow(
     isUnlocked: Boolean,
     onQuantityChange: (Int) -> Unit
 ) {
-    var localQuantity by remember(id) { mutableIntStateOf(initialQuantity) }
+    var localQuantity by rememberSaveable(id) { mutableIntStateOf(initialQuantity) }
     
     // Sycn from external (e.g. DB emission)
     androidx.compose.runtime.LaunchedEffect(initialQuantity) {

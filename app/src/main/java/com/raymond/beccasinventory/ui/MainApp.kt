@@ -35,6 +35,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -80,17 +82,21 @@ fun MainApp(
     }
 
     // Controls whether the Add InventoryItem sheet is open
-    var showAddInventoryItem by remember { mutableStateOf(false) }
+    var showAddInventoryItem by rememberSaveable { mutableStateOf(false) }
 
-    var searchQuery by remember { mutableStateOf("") }
-    var sortType by remember { mutableStateOf(InventorySortType.NAME) }
-    var sortDirection by remember { mutableStateOf(SortDirection.ASCENDING) }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var sortType by rememberSaveable { mutableStateOf(InventorySortType.NAME) }
+    var sortDirection by rememberSaveable { mutableStateOf(SortDirection.ASCENDING) }
     
     // Multi-Select States hoisted to parent
-    var selectedInventoryItemIds by remember { mutableStateOf(setOf<Long>()) }
+    val longSetSaver = listSaver<Set<Long>, Long>(
+        save = { it.toList() },
+        restore = { it.toSet() }
+    )
+    var selectedInventoryItemIds by rememberSaveable(stateSaver = longSetSaver) { mutableStateOf(emptySet<Long>()) }
     
     // Show confirmation dialog state
-    var showDeleteConfirm by remember { mutableStateOf(false) }
+    var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
 
     // Lock/Unlock state observed from DataStore
     val isLocked by inventoryViewModel.isLocked.collectAsState()
@@ -213,7 +219,7 @@ fun MainApp(
                         modifier = Modifier.padding(end = 8.dp)
                     )
                     
-                    var showSortMenu by remember { mutableStateOf(false) }
+                    var showSortMenu by rememberSaveable { mutableStateOf(false) }
                     Box {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
