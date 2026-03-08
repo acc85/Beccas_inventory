@@ -36,6 +36,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -143,7 +144,11 @@ private fun EditInventoryItemContent(
     
     val launchImagePicker = rememberImagePickerLauncher(onImageSelected = { uri -> imageUriString = uri.toString() })
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var isHiding by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { it != SheetValue.Hidden || isHiding }
+    )
     val scope = androidx.compose.runtime.rememberCoroutineScope()
 
     ModalBottomSheet(
@@ -158,6 +163,7 @@ private fun EditInventoryItemContent(
                     title = { Text("Edit InventoryItem") },
                     navigationIcon = {
                         IconButton(onClick = {
+                            isHiding = true
                             scope.launch {
                                 sheetState.hide()
                                 onDismiss()

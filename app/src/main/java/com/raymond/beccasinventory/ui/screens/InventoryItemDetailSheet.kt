@@ -32,13 +32,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,7 +61,11 @@ fun InventoryItemDetailSheet(
     onDismiss: () -> Unit
 ) {
     if (inventoryItem != null) {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        var isHiding by remember { mutableStateOf(false) }
+        val sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
+            confirmValueChange = { it != SheetValue.Hidden || isHiding }
+        )
         val scope = rememberCoroutineScope()
         
         ModalBottomSheet(
@@ -71,6 +80,7 @@ fun InventoryItemDetailSheet(
                             title = { Text("Details") },
                             navigationIcon = {
                                 IconButton(onClick = {
+                                    isHiding = true
                                     scope.launch {
                                         sheetState.hide()
                                         onDismiss()
