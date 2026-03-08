@@ -47,6 +47,7 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -83,9 +84,7 @@ fun InventoryItemDetailSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,
             dragHandle = null,
-            containerColor = MaterialTheme.colorScheme.surface,
-            tonalElevation = 0.dp,
-            windowInsets = WindowInsets.statusBars
+            scrimColor = Color.Transparent
         ) {
             // Connection that consumes vertical scroll to prevent sheet dragging down
             val nestedScrollConnection = remember {
@@ -128,7 +127,7 @@ fun InventoryItemDetailSheet(
                                 }
                             },
                             colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.surface
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
                             ),
                             windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
                         )

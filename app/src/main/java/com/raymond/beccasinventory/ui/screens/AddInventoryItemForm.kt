@@ -179,9 +179,7 @@ private fun AddInventoryItemContent(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = null,
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 0.dp,
-        windowInsets = WindowInsets.statusBars
+        scrimColor = Color.Transparent
     ) {
         // Connection that consumes vertical scroll to prevent sheet dragging down
         val nestedScrollConnection = remember {
@@ -224,7 +222,7 @@ private fun AddInventoryItemContent(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
                     ),
                     windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
                 )
