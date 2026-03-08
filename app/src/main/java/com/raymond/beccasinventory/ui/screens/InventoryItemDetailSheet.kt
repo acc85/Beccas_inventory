@@ -48,6 +48,17 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
@@ -73,7 +84,31 @@ fun InventoryItemDetailSheet(
             sheetState = sheetState,
             dragHandle = null
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            // Connection that consumes vertical scroll to prevent sheet dragging down
+            val nestedScrollConnection = remember {
+                object : NestedScrollConnection {
+                    override fun onPostScroll(
+                        consumed: Offset,
+                        available: Offset,
+                        source: NestedScrollSource
+                    ): Offset = available.copy(y = available.y.coerceAtLeast(0f))
+                }
+            }
+            val statusBarTopDp = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+            val maxSheetHeight = LocalConfiguration.current.screenHeightDp.dp - statusBarTopDp
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = maxSheetHeight)
+                    .navigationBarsPadding()
+                    .nestedScroll(nestedScrollConnection)
+                    .pointerInput(Unit) {
+                        detectDragGestures { change, _ ->
+                            change.consume()
+                        }
+                    }
+            ) {
 
                 // ── Toolbar ────────────────────────────────────────
                         TopAppBar(
