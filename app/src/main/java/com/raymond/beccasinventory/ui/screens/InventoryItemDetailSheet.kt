@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,11 +31,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,52 +55,34 @@ fun InventoryItemDetailSheet(
     inventoryItem: InventoryItem?,
     onDismiss: () -> Unit
 ) {
-    val visible = inventoryItem != null
+    if (inventoryItem != null) {
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        val scope = rememberCoroutineScope()
+        
+        ModalBottomSheet(
+            onDismissRequest = onDismiss,
+            sheetState = sheetState,
+            dragHandle = null
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
 
-    // Scrim
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(animationSpec = tween(250)),
-        exit = fadeOut(animationSpec = tween(250))
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.45f))
-                .clickable(onClick = onDismiss)
-        )
-    }
-
-    // Sheet
-    AnimatedVisibility(
-        visible = visible,
-        enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(380)),
-        exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(300))
-    ) {
-        if (inventoryItem != null) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-                    tonalElevation = 8.dp,
-                    shadowElevation = 8.dp
-                ) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-
-                        // ── Toolbar ────────────────────────────────────────
+                // ── Toolbar ────────────────────────────────────────
                         TopAppBar(
                             title = { Text("Details") },
                             navigationIcon = {
-                                IconButton(onClick = onDismiss) {
+                                IconButton(onClick = {
+                                    scope.launch {
+                                        sheetState.hide()
+                                        onDismiss()
+                                    }
+                                }) {
                                     Icon(Icons.Filled.Close, contentDescription = "Close")
                                 }
                             },
                             colors = TopAppBarDefaults.topAppBarColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
+                            ),
+                            windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
                         )
 
                         // ── Body ───────────────────────────────────────────
@@ -182,8 +169,6 @@ fun InventoryItemDetailSheet(
                     }
                 }
             }
-        }
-    }
 }
 
 

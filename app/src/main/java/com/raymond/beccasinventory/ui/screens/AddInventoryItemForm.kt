@@ -35,15 +35,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -152,30 +155,33 @@ private fun AddInventoryItemContent(
     
     val launchImagePicker = rememberImagePickerLauncher(onImageSelected = { uri -> imageUriString = uri.toString() })
 
-    // Sheet sits at the bottom, aligned to the bottom of the screen
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-            tonalElevation = 8.dp,
-            shadowElevation = 8.dp
-        ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
 
-                // ── Toolbar ─────────────────────────────────────────────
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        dragHandle = null
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+
+            // ── Toolbar ─────────────────────────────────────────────
                 TopAppBar(
                     title = { Text("Add New InventoryItem") },
                     navigationIcon = {
-                        IconButton(onClick = onDismiss) {
+                        IconButton(onClick = {
+                            scope.launch {
+                                sheetState.hide()
+                                onDismiss()
+                            }
+                        }) {
                             Icon(Icons.Filled.Close, contentDescription = "Close")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
+                    ),
+                    windowInsets = androidx.compose.foundation.layout.WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
                 )
 
                 // ── Body ─────────────────────────────────────────────────
@@ -375,7 +381,6 @@ private fun AddInventoryItemContent(
 
                     Spacer(modifier = Modifier.height(24.dp))
                 }
-            }
         }
     }
 }
