@@ -178,7 +178,9 @@ private fun AddInventoryItemContent(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        dragHandle = null
+        dragHandle = null,
+        sheetMaxWidth = androidx.compose.ui.unit.Dp.Unspecified,
+        windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
     ) {
         // Connection that consumes vertical scroll to prevent sheet dragging down
         val nestedScrollConnection = remember {
