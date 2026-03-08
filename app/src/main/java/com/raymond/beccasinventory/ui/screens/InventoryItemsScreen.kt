@@ -237,7 +237,7 @@ fun SwipeableInventoryItemItem(
     // Positive offset = card moves RIGHT = buttons revealed on LEFT
     val offsetX = remember { Animatable(0f) }
     // Measure the width of the action buttons so we know how far to drag
-    var revealWidthPx by remember { mutableStateOf(0f) }
+    var revealWidthPx by remember { mutableFloatStateOf(0f) }
 
     Box(
         modifier = modifier
@@ -438,7 +438,7 @@ fun QuantityRow(
     isUnlocked: Boolean,
     onQuantityChange: (Int) -> Unit
 ) {
-    var localQuantity by remember(id) { mutableStateOf(initialQuantity) }
+    var localQuantity by remember(id) { mutableIntStateOf(initialQuantity) }
     
     // Sycn from external (e.g. DB emission)
     androidx.compose.runtime.LaunchedEffect(initialQuantity) {

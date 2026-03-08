@@ -140,7 +140,7 @@ fun MainApp(
                             }
                         } else {
                             if (currentRoute == BottomRoute.InventoryItems) {
-                                androidx.compose.foundation.layout.Row {
+                                Row {
                                     IconButton(onClick = { inventoryViewModel.toggleLocked() }) {
                                         Icon(
                                             imageVector = if (isUnlocked) Icons.Filled.LockOpen else Icons.Filled.Lock,

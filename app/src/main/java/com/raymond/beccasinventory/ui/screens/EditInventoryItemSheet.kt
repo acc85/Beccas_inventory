@@ -1,6 +1,5 @@
 package com.raymond.beccasinventory.ui.screens
 
-import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
@@ -58,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.raymond.beccasinventory.models.InventoryItem
 import com.raymond.beccasinventory.models.Tag
+import androidx.core.net.toUri
 
 /**
  * A bottom sheet pre-populated with an existing [InventoryItem] for editing.
@@ -122,7 +122,7 @@ private fun EditInventoryItemContent(
     // Pre-fill fields from existing entry
     var name by remember(initial.id) { mutableStateOf(initial.name) }
     var quantity by remember(initial.id) { mutableStateOf(initial.quantity.toString()) }
-    var imageUri by remember { mutableStateOf(if (initial.imageUri != null) Uri.parse(initial.imageUri) else null) }
+    var imageUri by remember { mutableStateOf(initial.imageUri?.toUri()) }
     var currentTag by remember(initial.id) { mutableStateOf("") }
     val tags = remember { mutableStateListOf<Tag>() }.also { it.addAll(initial.tags) }
     
